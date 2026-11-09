@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoxScribe – Audio Transcription</title>
+<style>
+:root{--bg:#060b22;--panel:#0b1438;--panel2:#08102e;--line:#1b2c6b;--text:#eaf0ff;--muted:#9fb0e0;--a1:#8b5cf6;--a2:#06b6d4;--blue:#2563eb;--ok:#22c55e;--red:#ef4444;--grad:linear-gradient(90deg,#9b5cf6,#2f7bf5 55%,#06c6e8)}
+:root[data-theme=light]{--bg:#eef2ff;--panel:#fff;--panel2:#f3f6ff;--line:#c7d3f5;--text:#0f1b44;--muted:#52618f}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{display:grid;grid-template-columns:240px 1fr;gap:16px;padding:20px;max-width:1500px;margin:auto}
+.side{background:linear-gradient(180deg,var(--panel),#0a1a5c 90%);border:1px solid var(--line);border-radius:28px;padding:22px 16px;display:flex;flex-direction:column;min-height:calc(100vh - 40px)}
+.logo{text-align:center;margin-bottom:22px}.logo b{font-size:28px;display:block}.logo small{color:var(--muted)}
+.bars{display:flex;gap:4px;justify-content:center;align-items:center;height:44px;margin-bottom:6px}
+.bars i{width:5px;border-radius:3px;background:var(--grad);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scaleY(.55)}}
+.nav button{display:flex;gap:12px;align-items:center;width:100%;background:none;border:0;color:var(--text);font:600 15px inherit;padding:13px 14px;border-radius:14px;cursor:pointer;margin-bottom:6px}
+.nav button.on{background:linear-gradient(90deg,#2f7bf5,#9b5cf6)}
+.nav button:not(.on):hover{background:var(--panel2)}
+.off{margin-top:auto;border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:13px;background:var(--panel2)}
+.off b{display:flex;gap:8px;align-items:center;font-size:14px}.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);display:inline-block}
+.priv{color:var(--muted);font-size:12px;text-align:center;margin-top:16px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.badge{display:inline-flex;gap:8px;align-items:center;background:#0a3b2a;color:#4ade80;border:1px solid #166534;padding:6px 14px;border-radius:999px;font-weight:600;font-size:14px}
+h1{margin:10px 0 4px;font-size:clamp(28px,4.2vw,50px);line-height:1.05}
+h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);margin:0;font-size:17px}
+.tools{display:flex;gap:10px;align-items:center}
+.pill,.ico{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 18px;font:600 14px inherit;cursor:pointer}
+.ico{padding:10px 12px;border-radius:50%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:16px}
+.drop{border:2px dashed #2f6bff;border-radius:18px;padding:26px 14px;text-align:center;cursor:pointer;transition:.2s}
+.drop.over{background:#12306e;border-color:var(--a2)}
+.drop h3{margin:8px 0 4px;font-size:20px}.drop p{margin:3px 0;color:var(--muted);font-size:14px}
+.btn{border:0;color:#fff;font:700 16px inherit;padding:11px 26px;border-radius:12px;cursor:pointer;background:linear-gradient(90deg,#2563eb,#8b5cf6);margin-top:10px}
+.row{display:flex;align-items:center;gap:14px;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
+.row[hidden]{display:none}
+.mus{width:46px;height:46px;border-radius:12px;background:var(--panel);display:grid;place-items:center;font-size:22px}
+.grow{flex:1;min-width:0}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grow small{color:var(--muted)}
+.x{background:none;border:0;color:var(--text);font-size:22px;cursor:pointer}
+.play{width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:16px;cursor:pointer}
+canvas{flex:1;height:48px;min-width:0;cursor:pointer}
+.tm{font-size:12px;color:var(--muted);white-space:nowrap}
+input[type=range]{width:90px;accent-color:#2f7bf5}
+.go{width:100%;margin-top:12px;padding:17px;font-size:19px;border-radius:16px;background:linear-gradient(90deg,#a855f7,#2f7bf5 55%,#06d6f5)}
+.go:disabled{opacity:.45;cursor:not-allowed}
+.thead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.thead h2{margin:0;font-size:20px}
+.stat{padding:5px 16px;border-radius:999px;font-weight:600;font-size:14px;border:1px solid #166534;color:#4ade80;background:#0a3b2a}
+.stat.busy{border-color:#a16207;color:#facc15;background:#3b2a08}.stat.err{border-color:#991b1b;color:#f87171;background:#3b0d0d}
+.out{background:var(--bg);border:1px solid var(--line);border-radius:16px;height:330px;overflow:auto;padding:16px;white-space:pre-wrap;line-height:1.6;font-size:15px}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);gap:6px}
+.empty b{color:var(--text);font-size:19px}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.acts button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:12px;border-radius:12px;font:600 14px inherit;cursor:pointer}
+.acts button:hover{border-color:var(--a2)}
+.recent{margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--panel2);text-align:left;padding:10px 12px}td{padding:11px 12px;border-top:1px solid var(--line)}
+td button{background:none;border:0;cursor:pointer;font-size:17px;color:var(--text)}td .del{color:var(--red)}
+.hide{display:none}
+.cfg{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.cfg input{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:9px 12px}
+.msg{color:var(--muted);font-size:13px;margin-top:8px}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.side{min-height:0}.grid{grid-template-columns:1fr}.off,.priv{display:none}.nav{display:flex;gap:6px;flex-wrap:wrap}.nav button{width:auto}}
+:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo"><div class="bars" aria-hidden="true"></div><b>VoxScribe</b><small>Speak · Transcribe · Save</small></div>
+  <nav class="nav">
+    <button class="on" data-go="top">🏠 Dashboard</button>
+    <button data-go="recent">🕘 History</button>
+    <button data-go="cfg">⚙️ Settings</button>
+    <button data-go="about">ⓘ About</button>
+  </nav>
+  <div class="off"><b><span class="dot"></span>Offline mode</b><span>Runs locally</span></div>
+  <div class="priv">🛡️ Your audio never leaves this computer</div>
+</aside>
+
+<main id="top">
+  <header>
+    <div>
+      <span class="badge"><span class="dot"></span>Local application</span>
+      <h1><span>Audio Transcription</span></h1>
+      <p class="sub">Upload your audio and get a transcript, completely offline.</p>
+    </div>
+    <div class="tools"><button class="pill" id="theme">🌙 Dark mode</button><button class="ico" data-go="cfg" aria-label="Settings">⚙️</button></div>
+  </header>
+
+  <div class="grid">
+    <section>
+      <div class="card">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an audio file">
+          <div style="font-size:46px">☁️</div>
+          <h3>Drag &amp; drop your audio file here</h3>
+          <p>or click to browse</p>
+          <p>Supports MP3, WAV, M4A, OGG (max 100 MB)</p>
+          <button class="btn" type="button">📁 Choose file</button>
+        </div>
+        <input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" class="hide">
+        <div class="row" id="fileRow" hidden>
+          <div class="mus">🎵</div>
+          <div class="grow"><b id="fName"></b><small id="fMeta"></small></div>
+          <span style="color:var(--ok);font-size:22px">✔</span>
+          <button class="x" id="clear" aria-label="Remove file">✕</button>
+        </div>
+        <div class="row" id="playRow" hidden>
+          <button class="play" id="play" aria-label="Play or pause">▶</button>
+          <canvas id="wave" width="600" height="96"></canvas>
+          <span class="tm" id="time">00:00 / 00:00</span>
+          <span>🔊</span><input type="range" id="vol" min="0" max="1" step="0.05" value="1" aria-label="Volume">
+        </div>
+        <button class="btn go" id="go" disabled>✨ Transcribe audio →</button>
+        <p class="msg" id="msg"></p>
+      </div>
+      <div class="card" id="cfg" style="margin-top:16px">
+        <b>Settings</b>
+        <div class="cfg"><label for="srv">Backend address</label><input id="srv" value="" placeholder="same computer (default)"></div>
+        <div class="cfg"><label for="lang">Language</label><input id="lang" value="auto" style="max-width:120px;min-width:0;flex:0 0 120px"><span>(auto, en, hi, kn…)</span></div>
+      </div>
+    </section>
+
+    <section class="card" style="display:flex;flex-direction:column">
+      <div class="thead"><h2>📄 Transcript</h2><span class="stat" id="stat">Ready</span></div>
+      <div class="out" id="out"><div class="empty"><div style="font-size:42px">📝</div><b>Your transcript will appear here…</b><span>Upload an audio file and click “Transcribe audio” to get started.</span></div></div>
+      <div class="acts"><button id="copy">📋 Copy</button><button id="dl">⬇ Download .txt</button><button id="save">🗄 Save to database</button></div>
+    </section>
+  </div>
+
+  <section class="card recent" id="recent">
+    <div class="thead"><h2>🕘 Recent transcriptions</h2></div>
+    <table>
+      <thead><tr><th>#</th><th>File name</th><th>Duration</th><th>Transcribed on</th><th>Actions</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="msg" id="noRows">No saved transcriptions yet. Use “Save to database” after transcribing.</p>
+  </section>
+
+  <section class="card" id="about" style="margin-top:16px">
+    <b>About</b>
+    <p class="msg">Run <code>python app.py</code> from the VOXSCRIBE folder, then open <code>http://127.0.0.1:5000</code>. Audio is processed on this computer by whisper.cpp and saved transcripts go to the output folder and this browser.</p>
+  </section>
+</main>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const bars=$('.bars');[18,30,44,36,24,40,28,14].forEach((h,i)=>{const e=document.createElement('i');e.style.height=h+'px';e.style.animationDelay=i*.12+'s';bars.appendChild(e)});
+
+let file=null,audio=null,peaks=[],transcript='',dur=0;
+const fmt=s=>{s=Math.max(0,Math.round(s||0));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const setStat=(t,c='')=>{const s=$('#stat');s.textContent=t;s.className='stat '+c};
+
+/* theme */
+$('#theme').onclick=()=>{const r=document.documentElement,l=r.dataset.theme==='light';r.dataset.theme=l?'dark':'light';$('#theme').textContent=l?'🌙 Dark mode':'☀️ Light mode'};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(n=>n.classList.toggle('on',n===b));document.getElementById(b.dataset.go).scrollIntoView({behavior:'smooth'})});
+
+/* file picking */
+const drop=$('#drop'),inp=$('#file');
+drop.onclick=()=>inp.click();
+drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click()}};
+['dragenter','dragover'].forEach(v=>drop.addEventListener(v,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(v=>drop.addEventListener(v,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>pick(e.dataTransfer.files[0]));
+inp.onchange=()=>pick(inp.files[0]);
+$('#clear').onclick=reset;
+
+function reset(){if(audio){audio.pause();URL.revokeObjectURL(audio.src)}file=audio=null;inp.value='';$('#fileRow').hidden=$('#playRow').hidden=true;$('#go').disabled=true;$('#msg').textContent='';$('#play').textContent='▶'}
+
+async function pick(f){
+  if(!f)return;
+  if(f.size>100*1024*1024){$('#msg').textContent='That file is larger than 100 MB. Choose a smaller file.';return}
+  if(!f.type.startsWith('audio/')&&!/\.(mp3|wav|m4a|ogg|flac|aac|wma|opus|webm|mp4)$/i.test(f.name)){$('#msg').textContent='Unsupported file type. Use MP3, WAV, M4A, OGG, FLAC, AAC or WMA.';return}
+  reset();file=f;$('#msg').textContent='';
+  audio=new Audio(URL.createObjectURL(f));audio.volume=$('#vol').value;
+  $('#fName').textContent=f.name;
+  audio.onloadedmetadata=()=>{dur=audio.duration;$('#fMeta').textContent=(f.size/1048576).toFixed(1)+' MB • '+fmt(dur);tick()};
+  audio.ontimeupdate=()=>{tick();draw()};
+  audio.onended=()=>{$('#play').textContent='▶'};
+  $('#fileRow').hidden=$('#playRow').hidden=false;$('#go').disabled=false;
+  peaks=[];draw();
+  try{ // build waveform
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const buf=await ctx.decodeAudioData(await f.arrayBuffer());ctx.close();
+    const d=buf.getChannelData(0),n=90,step=Math.floor(d.length/n);
+    peaks=Array.from({length:n},(_,i)=>{let m=0;for(let j=i*step;j<(i+1)*step;j+=Math.max(1,step>>6))m=Math.max(m,Math.abs(d[j]||0));return m});
+    const mx=Math.max(...peaks)||1;peaks=peaks.map(p=>p/mx);draw();
+  }catch(e){}
+}
+function tick(){$('#time').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration)}
+function draw(){
+  const c=$('#wave'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
+  const n=peaks.length||90,w=c.width/n,p=audio&&audio.duration?audio.currentTime/audio.duration:0;
+  for(let i=0;i<n;i++){const h=Math.max(4,(peaks[i]??.2)*c.height*.9);g.fillStyle=i/n<p?'#2f7bf5':'#6d5bd0';g.fillRect(i*w+1,(c.height-h)/2,w-2,h)}
+}
+$('#wave').onclick=e=>{if(!audio||!audio.duration)return;const r=e.target.getBoundingClientRect();audio.currentTime=(e.clientX-r.left)/r.width*audio.duration};
+$('#play').onclick=()=>{if(!audio)return;if(audio.paused){audio.play();$('#play').textContent='❚❚'}else{audio.pause();$('#play').textContent='▶'}};
+$('#vol').oninput=e=>{if(audio)audio.volume=e.target.value};
+
+/* transcription via whisper.cpp server */
+$('#go').onclick=async()=>{
+  if(!file)return;
+  const base=$('#srv').value.trim().replace(/\/+$/,'');
+  const fd=new FormData();
+  fd.append('file',file);
+  fd.append('language',$('#lang').value.trim()||'auto');
+  $('#go').disabled=true;setStat('Transcribing…','busy');$('#msg').textContent='Working on it. Long files can take a few minutes.';
+  try{
+    const r=await fetch(base+'/api/transcribe',{method:'POST',body:fd});
+        const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.error||("Server returned "+r.status));
+    if(j.error)throw new Error(j.error);
+    transcript=(j.text||'').trim();
+    const o=$('#out');o.textContent=transcript||'No speech was detected in this file.';
+    setStat('Done');$('#msg').textContent='';
+  }catch(e){
+    setStat('Error','err');
+    $('#msg').textContent=''+(e.message||'Transcription failed')+'. Check that app.py is running in the terminal.';
+  }
+  $('#go').disabled=false;
+};
+
+/* copy / download / save */
+const flash=(b,t)=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,1400)};
+$('#copy').onclick=async e=>{if(!transcript)return;try{await navigator.clipboard.writeText(transcript);flash(e.target,'✔ Copied')}catch{flash(e.target,'Copy failed')}};
+function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name.replace(/\.[^.]+$/,'')+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+$('#dl').onclick=()=>{if(transcript)download(file?file.name:'transcript',transcript)};
+const KEY='voxscribe.history';
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}};
+const store=a=>{try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch{return false}};
+$('#save').onclick=e=>{
+  if(!transcript)return;
+  const a=load();a.unshift({id:Date.now(),name:file?file.name:'transcript',dur:dur,at:new Date().toISOString(),text:transcript});
+  flash(e.target,store(a.slice(0,50))?'✔ Saved':'Save failed');render();
+};
+function render(){
+  const a=load(),tb=$('#rows');tb.innerHTML='';$('#noRows').hidden=a.length>0;
+  a.slice(0,10).forEach((h,i)=>{
+    const tr=document.createElement('tr');
+    const when=new Date(h.at).toLocaleString('en-US',{month:'short',day:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    [i+1,h.name,fmt(h.dur),when].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+    const td=document.createElement('td');
+    [['📄','View transcript',()=>{transcript=h.text;$('#out').textContent=h.text;setStat('Loaded');$('#top').scrollIntoView({behavior:'smooth'})}],
+     ['⬇','Download',()=>download(h.name,h.text)],
+     ['🗑','Delete',()=>{store(load().filter(x=>x.id!==h.id));render()},'del']].forEach(([ic,t,fn,cl])=>{
+      const b=document.createElement('button');b.textContent=ic;b.title=t;b.setAttribute('aria-label',t);if(cl)b.className=cl;b.onclick=fn;td.appendChild(b)});
+    tr.appendChild(td);tb.appendChild(tr);
+  });
+}
+render();
+</script>
+</body>
+</html>
