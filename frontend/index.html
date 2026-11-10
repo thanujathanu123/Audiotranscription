@@ -5,162 +5,186 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VoxScribe – Audio Transcription</title>
 <style>
-:root{--bg:#060b22;--panel:#0b1438;--panel2:#08102e;--line:#1b2c6b;--text:#eaf0ff;--muted:#9fb0e0;--a1:#8b5cf6;--a2:#06b6d4;--blue:#2563eb;--ok:#22c55e;--red:#ef4444;--grad:linear-gradient(90deg,#9b5cf6,#2f7bf5 55%,#06c6e8)}
-:root[data-theme=light]{--bg:#eef2ff;--panel:#fff;--panel2:#f3f6ff;--line:#c7d3f5;--text:#0f1b44;--muted:#52618f}
+:root{--bg:#f4f6fa;--surface:#fff;--sub:#f8fafc;--line:#e2e8f0;--text:#0f172a;--muted:#64748b;--pri:#1d4ed8;--pri-h:#1e40af;--tint:#eff6ff;--wave:#cbd5e1;--ok:#15803d;--okbg:#f0fdf4;--busy:#a16207;--busybg:#fefce8;--err:#b91c1c;--errbg:#fef2f2}
+:root[data-theme=dark]{--bg:#0b1220;--surface:#111a2e;--sub:#0e1729;--line:#22304d;--text:#e5ecf8;--muted:#94a3b8;--pri:#3b82f6;--pri-h:#60a5fa;--tint:#16233f;--wave:#33456b;--ok:#4ade80;--okbg:#0f2a1c;--busy:#facc15;--busybg:#2b2410;--err:#f87171;--errbg:#2c1414}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.app{display:grid;grid-template-columns:240px 1fr;gap:16px;padding:20px;max-width:1500px;margin:auto}
-.side{background:linear-gradient(180deg,var(--panel),#0a1a5c 90%);border:1px solid var(--line);border-radius:28px;padding:22px 16px;display:flex;flex-direction:column;min-height:calc(100vh - 40px)}
-.logo{text-align:center;margin-bottom:22px}.logo b{font-size:28px;display:block}.logo small{color:var(--muted)}
-.bars{display:flex;gap:4px;justify-content:center;align-items:center;height:44px;margin-bottom:6px}
-.bars i{width:5px;border-radius:3px;background:var(--grad);animation:pulse 1.6s ease-in-out infinite}
-@keyframes pulse{50%{transform:scaleY(.55)}}
-.nav button{display:flex;gap:12px;align-items:center;width:100%;background:none;border:0;color:var(--text);font:600 15px inherit;padding:13px 14px;border-radius:14px;cursor:pointer;margin-bottom:6px}
-.nav button.on{background:linear-gradient(90deg,#2f7bf5,#9b5cf6)}
-.nav button:not(.on):hover{background:var(--panel2)}
-.off{margin-top:auto;border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:13px;background:var(--panel2)}
-.off b{display:flex;gap:8px;align-items:center;font-size:14px}.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);display:inline-block}
-.priv{color:var(--muted);font-size:12px;text-align:center;margin-top:16px}
-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.badge{display:inline-flex;gap:8px;align-items:center;background:#0a3b2a;color:#4ade80;border:1px solid #166534;padding:6px 14px;border-radius:999px;font-weight:600;font-size:14px}
-h1{margin:10px 0 4px;font-size:clamp(28px,4.2vw,50px);line-height:1.05}
-h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{color:var(--muted);margin:0;font-size:17px}
-.tools{display:flex;gap:10px;align-items:center}
-.pill,.ico{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 18px;font:600 14px inherit;cursor:pointer}
-.ico{padding:10px 12px;border-radius:50%}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:16px}
-.drop{border:2px dashed #2f6bff;border-radius:18px;padding:26px 14px;text-align:center;cursor:pointer;transition:.2s}
-.drop.over{background:#12306e;border-color:var(--a2)}
-.drop h3{margin:8px 0 4px;font-size:20px}.drop p{margin:3px 0;color:var(--muted);font-size:14px}
-.btn{border:0;color:#fff;font:700 16px inherit;padding:11px 26px;border-radius:12px;cursor:pointer;background:linear-gradient(90deg,#2563eb,#8b5cf6);margin-top:10px}
-.row{display:flex;align-items:center;gap:14px;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 22px;font-weight:700;font-size:18px}
+.brand span.lg{width:32px;height:32px;border-radius:8px;background:var(--pri);display:grid;place-items:center;color:#fff}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:var(--muted);font:500 14px inherit;padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:2px;text-align:left}
+.nav button:hover{background:var(--sub);color:var(--text)}
+.nav button.on{background:var(--tint);color:var(--pri);font-weight:600}
+.local{margin-top:auto;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.local b{display:flex;align-items:center;gap:8px;color:var(--text);font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+main{padding:28px 32px 48px;max-width:1280px;width:100%}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.sub{margin:4px 0 0;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:500 14px inherit;padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--pri);color:var(--pri)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{background:var(--pri-h);border-color:var(--pri-h);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h2{margin:0 0 14px;font-size:16px;font-weight:600}
+.drop{border:1.5px dashed var(--wave);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;background:var(--sub);transition:.15s}
+.drop:hover,.drop.over{border-color:var(--pri);background:var(--tint)}
+.drop svg.big{width:34px;height:34px;color:var(--pri)}
+.drop p{margin:2px 0;color:var(--muted);font-size:13px}.drop .t{color:var(--text);font-weight:600;font-size:15px;margin-top:8px}
+.drop .btn{margin-top:12px}
+.row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px;background:var(--surface)}
 .row[hidden]{display:none}
-.mus{width:46px;height:46px;border-radius:12px;background:var(--panel);display:grid;place-items:center;font-size:22px}
-.grow{flex:1;min-width:0}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grow small{color:var(--muted)}
-.x{background:none;border:0;color:var(--text);font-size:22px;cursor:pointer}
-.play{width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:16px;cursor:pointer}
-canvas{flex:1;height:48px;min-width:0;cursor:pointer}
-.tm{font-size:12px;color:var(--muted);white-space:nowrap}
-input[type=range]{width:90px;accent-color:#2f7bf5}
-.go{width:100%;margin-top:12px;padding:17px;font-size:19px;border-radius:16px;background:linear-gradient(90deg,#a855f7,#2f7bf5 55%,#06d6f5)}
-.go:disabled{opacity:.45;cursor:not-allowed}
-.thead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.thead h2{margin:0;font-size:20px}
-.stat{padding:5px 16px;border-radius:999px;font-weight:600;font-size:14px;border:1px solid #166534;color:#4ade80;background:#0a3b2a}
-.stat.busy{border-color:#a16207;color:#facc15;background:#3b2a08}.stat.err{border-color:#991b1b;color:#f87171;background:#3b0d0d}
-.out{background:var(--bg);border:1px solid var(--line);border-radius:16px;height:330px;overflow:auto;padding:16px;white-space:pre-wrap;line-height:1.6;font-size:15px}
-.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);gap:6px}
-.empty b{color:var(--text);font-size:19px}
-.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.acts button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:12px;border-radius:12px;font:600 14px inherit;cursor:pointer}
-.acts button:hover{border-color:var(--a2)}
-.recent{margin-top:16px}
+.ficon{width:38px;height:38px;border-radius:8px;background:var(--tint);color:var(--pri);display:grid;place-items:center}
+.grow{flex:1;min-width:0}.grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.grow small{color:var(--muted)}
+.ok{color:var(--ok)}
+.ib{background:none;border:0;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px;display:inline-flex}
+.ib:hover{background:var(--sub);color:var(--text)}.ib.del:hover{color:var(--err)}
+.play{width:38px;height:38px;border-radius:50%;border:0;background:var(--pri);color:#fff;display:grid;place-items:center;cursor:pointer}
+.play:hover{background:var(--pri-h)}.play svg{width:14px;height:14px}
+canvas{flex:1;min-width:0;height:44px;cursor:pointer}
+.tm{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+input[type=range]{width:80px;accent-color:var(--pri)}
+.go{width:100%;margin-top:14px;padding:12px;font-size:15px;font-weight:600}
+.msg{color:var(--muted);font-size:13px;margin:10px 0 0;min-height:1em}
+.field{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:14px}
+.field label{width:130px;color:var(--muted)}
+.field input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit}
+.field input:focus,.btn:focus-visible,.drop:focus-visible,.nav button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.thead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.thead h2{margin:0}
+.stat{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;color:var(--ok);background:var(--okbg)}
+.stat.busy{color:var(--busy);background:var(--busybg)}.stat.err{color:var(--err);background:var(--errbg)}
+.out{border:1px solid var(--line);background:var(--sub);border-radius:10px;height:340px;overflow:auto;padding:16px;white-space:pre-wrap;line-height:1.65}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);gap:4px}
+.empty svg{width:30px;height:30px;margin-bottom:6px}.empty b{color:var(--text);font-weight:600}
+.acts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.card.mt{margin-top:20px}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th{background:var(--panel2);text-align:left;padding:10px 12px}td{padding:11px 12px;border-top:1px solid var(--line)}
-td button{background:none;border:0;cursor:pointer;font-size:17px;color:var(--text)}td .del{color:var(--red)}
-.hide{display:none}
-.cfg{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px}
-.cfg input{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:9px 12px}
-.msg{color:var(--muted);font-size:13px;margin-top:8px}
-@media(max-width:1000px){.app{grid-template-columns:1fr}.side{min-height:0}.grid{grid-template-columns:1fr}.off,.priv{display:none}.nav{display:flex;gap:6px;flex-wrap:wrap}.nav button{width:auto}}
-:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:10px 12px;background:var(--sub);border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line)}tr:last-child td{border-bottom:0}
+.wrap{overflow-x:auto}
+code{background:var(--sub);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:13px}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px}.brand{padding:0}.nav{display:flex;gap:4px;flex-wrap:wrap}.nav button{width:auto}.local{display:none}.grid{grid-template-columns:1fr}main{padding:20px 16px}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="gear" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="up" viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9"/><path d="M20.4 18.4A5 5 0 0 0 18 9h-1.3A8 8 0 1 0 4 16.3"/></symbol>
+<symbol id="music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="currentColor"/></symbol>
+<symbol id="pause" viewBox="0 0 24 24"><path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor"/></symbol>
+<symbol id="vol" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></symbol>
+<symbol id="copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></symbol>
+<symbol id="trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+<symbol id="ck" viewBox="0 0 24 24"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14l-3-3"/></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="wv" viewBox="0 0 24 24"><path d="M4 10v4M8 6v12M12 3v18M16 8v8M20 11v2"/></symbol>
+</defs></svg>
+
 <div class="app">
 <aside class="side">
-  <div class="logo"><div class="bars" aria-hidden="true"></div><b>VoxScribe</b><small>Speak · Transcribe · Save</small></div>
+  <div class="brand"><span class="lg"><svg class="i" style="stroke:#fff"><use href="#wv"/></svg></span>VoxScribe</div>
   <nav class="nav">
-    <button class="on" data-go="top">🏠 Dashboard</button>
-    <button data-go="recent">🕘 History</button>
-    <button data-go="cfg">⚙️ Settings</button>
-    <button data-go="about">ⓘ About</button>
+    <button class="on" data-go="top"><svg class="i"><use href="#home"/></svg>Dashboard</button>
+    <button data-go="recent"><svg class="i"><use href="#clock"/></svg>History</button>
+    <button data-go="cfg"><svg class="i"><use href="#gear"/></svg>Settings</button>
+    <button data-go="about"><svg class="i"><use href="#info"/></svg>About</button>
   </nav>
-  <div class="off"><b><span class="dot"></span>Offline mode</b><span>Runs locally</span></div>
-  <div class="priv">🛡️ Your audio never leaves this computer</div>
+  <div class="local"><b><span class="dot"></span>Offline mode</b>Runs locally on this computer</div>
 </aside>
 
 <main id="top">
-  <header>
-    <div>
-      <span class="badge"><span class="dot"></span>Local application</span>
-      <h1><span>Audio Transcription</span></h1>
-      <p class="sub">Upload your audio and get a transcript, completely offline.</p>
-    </div>
-    <div class="tools"><button class="pill" id="theme">🌙 Dark mode</button><button class="ico" data-go="cfg" aria-label="Settings">⚙️</button></div>
-  </header>
+  <div class="top">
+    <div><h1>Audio Transcription</h1><p class="sub">Upload an audio file and convert it to text. Everything runs on this computer.</p></div>
+    <button class="btn" id="theme"><svg class="i"><use href="#moon"/></svg><span>Dark mode</span></button>
+  </div>
 
   <div class="grid">
-    <section>
-      <div class="card">
+    <div>
+      <section class="card">
+        <h2>Audio file</h2>
         <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose an audio file">
-          <div style="font-size:46px">☁️</div>
-          <h3>Drag &amp; drop your audio file here</h3>
+          <svg class="i big"><use href="#up"/></svg>
+          <div class="t">Drag and drop your audio file here</div>
           <p>or click to browse</p>
-          <p>Supports MP3, WAV, M4A, OGG (max 100 MB)</p>
-          <button class="btn" type="button">📁 Choose file</button>
+          <p>MP3, WAV, M4A, OGG and more (max 100 MB)</p>
+          <button class="btn pri" type="button">Choose file</button>
         </div>
-        <input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" class="hide">
+        <input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac,.wma" hidden>
         <div class="row" id="fileRow" hidden>
-          <div class="mus">🎵</div>
+          <div class="ficon"><svg class="i"><use href="#music"/></svg></div>
           <div class="grow"><b id="fName"></b><small id="fMeta"></small></div>
-          <span style="color:var(--ok);font-size:22px">✔</span>
-          <button class="x" id="clear" aria-label="Remove file">✕</button>
+          <svg class="i ok"><use href="#ck"/></svg>
+          <button class="ib" id="clear" aria-label="Remove file"><svg class="i"><use href="#x"/></svg></button>
         </div>
         <div class="row" id="playRow" hidden>
-          <button class="play" id="play" aria-label="Play or pause">▶</button>
-          <canvas id="wave" width="600" height="96"></canvas>
+          <button class="play" id="play" aria-label="Play or pause"><svg class="i"><use href="#play"/></svg></button>
+          <canvas id="wave" width="600" height="88"></canvas>
           <span class="tm" id="time">00:00 / 00:00</span>
-          <span>🔊</span><input type="range" id="vol" min="0" max="1" step="0.05" value="1" aria-label="Volume">
+          <svg class="i" style="color:var(--muted)"><use href="#vol"/></svg><input type="range" id="vol" min="0" max="1" step="0.05" value="1" aria-label="Volume">
         </div>
-        <button class="btn go" id="go" disabled>✨ Transcribe audio →</button>
+        <button class="btn pri go" id="go" disabled>Transcribe audio</button>
         <p class="msg" id="msg"></p>
-      </div>
-      <div class="card" id="cfg" style="margin-top:16px">
-        <b>Settings</b>
-        <div class="cfg"><label for="srv">Backend address</label><input id="srv" value="" placeholder="same computer (default)"></div>
-        <div class="cfg"><label for="lang">Language</label><input id="lang" value="auto" style="max-width:120px;min-width:0;flex:0 0 120px"><span>(auto, en, hi, kn…)</span></div>
-      </div>
-    </section>
+      </section>
 
-    <section class="card" style="display:flex;flex-direction:column">
-      <div class="thead"><h2>📄 Transcript</h2><span class="stat" id="stat">Ready</span></div>
-      <div class="out" id="out"><div class="empty"><div style="font-size:42px">📝</div><b>Your transcript will appear here…</b><span>Upload an audio file and click “Transcribe audio” to get started.</span></div></div>
-      <div class="acts"><button id="copy">📋 Copy</button><button id="dl">⬇ Download .txt</button><button id="save">🗄 Save to database</button></div>
+      <section class="card mt" id="cfg">
+        <h2>Settings</h2>
+        <div class="field"><label for="srv">Backend address</label><input id="srv" value="" placeholder="Leave empty (this computer)"></div>
+        <div class="field"><label for="lang">Language</label><input id="lang" value="auto" placeholder="auto, en, hi…"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="thead"><h2>Transcript</h2><span class="stat" id="stat">Ready</span></div>
+      <div class="out" id="out"><div class="empty"><svg class="i"><use href="#doc"/></svg><b>Your transcript will appear here</b><span>Upload an audio file and click “Transcribe audio” to start.</span></div></div>
+      <div class="acts">
+        <button class="btn" id="copy"><svg class="i"><use href="#copy"/></svg><span>Copy</span></button>
+        <button class="btn" id="dl"><svg class="i"><use href="#dl"/></svg><span>Download .txt</span></button>
+        <button class="btn" id="save"><svg class="i"><use href="#db"/></svg><span>Save to database</span></button>
+      </div>
     </section>
   </div>
 
-  <section class="card recent" id="recent">
-    <div class="thead"><h2>🕘 Recent transcriptions</h2></div>
-    <table>
+  <section class="card mt" id="recent">
+    <div class="thead"><h2>Recent transcriptions</h2></div>
+    <div class="wrap"><table>
       <thead><tr><th>#</th><th>File name</th><th>Duration</th><th>Transcribed on</th><th>Actions</th></tr></thead>
       <tbody id="rows"></tbody>
-    </table>
+    </table></div>
     <p class="msg" id="noRows">No saved transcriptions yet. Use “Save to database” after transcribing.</p>
   </section>
 
-  <section class="card" id="about" style="margin-top:16px">
-    <b>About</b>
-    <p class="msg">Run <code>python app.py</code> from the VOXSCRIBE folder, then open <code>http://127.0.0.1:5000</code>. Audio is processed on this computer by whisper.cpp and saved transcripts go to the output folder and this browser.</p>
+  <section class="card mt" id="about">
+    <h2>About</h2>
+    <p class="msg" style="margin:0">Run <code>python app.py</code> in the project folder, then open <code>http://127.0.0.1:5000</code>. Audio is processed on this computer by whisper.cpp. Transcripts are also saved as text files in the <code>output</code> folder.</p>
   </section>
 </main>
 </div>
 
 <script>
 const $=s=>document.querySelector(s);
-const bars=$('.bars');[18,30,44,36,24,40,28,14].forEach((h,i)=>{const e=document.createElement('i');e.style.height=h+'px';e.style.animationDelay=i*.12+'s';bars.appendChild(e)});
-
+const ic=n=>'<svg class="i"><use href="#'+n+'"/></svg>';
 let file=null,audio=null,peaks=[],transcript='',dur=0;
 const fmt=s=>{s=Math.max(0,Math.round(s||0));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const setStat=(t,c='')=>{const s=$('#stat');s.textContent=t;s.className='stat '+c};
 
-/* theme */
-$('#theme').onclick=()=>{const r=document.documentElement,l=r.dataset.theme==='light';r.dataset.theme=l?'dark':'light';$('#theme').textContent=l?'🌙 Dark mode':'☀️ Light mode'};
+$('#theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark';r.dataset.theme=d?'light':'dark';$('#theme').innerHTML=ic(d?'moon':'sun')+'<span>'+(d?'Dark mode':'Light mode')+'</span>';draw()};
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(n=>n.classList.toggle('on',n===b));document.getElementById(b.dataset.go).scrollIntoView({behavior:'smooth'})});
 
-/* file picking */
 const drop=$('#drop'),inp=$('#file');
 drop.onclick=()=>inp.click();
 drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click()}};
@@ -170,7 +194,7 @@ drop.addEventListener('drop',e=>pick(e.dataTransfer.files[0]));
 inp.onchange=()=>pick(inp.files[0]);
 $('#clear').onclick=reset;
 
-function reset(){if(audio){audio.pause();URL.revokeObjectURL(audio.src)}file=audio=null;inp.value='';$('#fileRow').hidden=$('#playRow').hidden=true;$('#go').disabled=true;$('#msg').textContent='';$('#play').textContent='▶'}
+function reset(){if(audio){audio.pause();URL.revokeObjectURL(audio.src)}file=audio=null;inp.value='';$('#fileRow').hidden=$('#playRow').hidden=true;$('#go').disabled=true;$('#msg').textContent='';$('#play').innerHTML=ic('play')}
 
 async function pick(f){
   if(!f)return;
@@ -181,10 +205,10 @@ async function pick(f){
   $('#fName').textContent=f.name;
   audio.onloadedmetadata=()=>{dur=audio.duration;$('#fMeta').textContent=(f.size/1048576).toFixed(1)+' MB • '+fmt(dur);tick()};
   audio.ontimeupdate=()=>{tick();draw()};
-  audio.onended=()=>{$('#play').textContent='▶'};
+  audio.onended=()=>{$('#play').innerHTML=ic('play')};
   $('#fileRow').hidden=$('#playRow').hidden=false;$('#go').disabled=false;
   peaks=[];draw();
-  try{ // build waveform
+  try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
     const buf=await ctx.decodeAudioData(await f.arrayBuffer());ctx.close();
     const d=buf.getChannelData(0),n=90,step=Math.floor(d.length/n);
@@ -192,51 +216,47 @@ async function pick(f){
     const mx=Math.max(...peaks)||1;peaks=peaks.map(p=>p/mx);draw();
   }catch(e){}
 }
-function tick(){$('#time').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration)}
+function tick(){if(audio)$('#time').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration)}
 function draw(){
   const c=$('#wave'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
-  const n=peaks.length||90,w=c.width/n,p=audio&&audio.duration?audio.currentTime/audio.duration:0;
-  for(let i=0;i<n;i++){const h=Math.max(4,(peaks[i]??.2)*c.height*.9);g.fillStyle=i/n<p?'#2f7bf5':'#6d5bd0';g.fillRect(i*w+1,(c.height-h)/2,w-2,h)}
+  const n=peaks.length||90,w=c.width/n,p=audio&&audio.duration?audio.currentTime/audio.duration:0,a=css('--pri'),b=css('--wave');
+  for(let i=0;i<n;i++){const h=Math.max(4,(peaks[i]??.15)*c.height*.9);g.fillStyle=i/n<p?a:b;g.fillRect(i*w+1,(c.height-h)/2,w-2,h)}
 }
 $('#wave').onclick=e=>{if(!audio||!audio.duration)return;const r=e.target.getBoundingClientRect();audio.currentTime=(e.clientX-r.left)/r.width*audio.duration};
-$('#play').onclick=()=>{if(!audio)return;if(audio.paused){audio.play();$('#play').textContent='❚❚'}else{audio.pause();$('#play').textContent='▶'}};
+$('#play').onclick=()=>{if(!audio)return;if(audio.paused){audio.play();$('#play').innerHTML=ic('pause')}else{audio.pause();$('#play').innerHTML=ic('play')}};
 $('#vol').oninput=e=>{if(audio)audio.volume=e.target.value};
 
-/* transcription via whisper.cpp server */
 $('#go').onclick=async()=>{
   if(!file)return;
   const base=$('#srv').value.trim().replace(/\/+$/,'');
-  const fd=new FormData();
-  fd.append('file',file);
-  fd.append('language',$('#lang').value.trim()||'auto');
+  const fd=new FormData();fd.append('file',file);fd.append('language',$('#lang').value.trim()||'auto');
   $('#go').disabled=true;setStat('Transcribing…','busy');$('#msg').textContent='Working on it. Long files can take a few minutes.';
   try{
     const r=await fetch(base+'/api/transcribe',{method:'POST',body:fd});
-        const j=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(j.error||("Server returned "+r.status));
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.error||('Server returned '+r.status));
     if(j.error)throw new Error(j.error);
     transcript=(j.text||'').trim();
-    const o=$('#out');o.textContent=transcript||'No speech was detected in this file.';
+    $('#out').textContent=transcript||'No speech was detected in this file.';
     setStat('Done');$('#msg').textContent='';
   }catch(e){
     setStat('Error','err');
-    $('#msg').textContent=''+(e.message||'Transcription failed')+'. Check that app.py is running in the terminal.';
+    $('#msg').textContent=(e.message||'Transcription failed')+'. Check that app.py is running in the terminal.';
   }
   $('#go').disabled=false;
 };
 
-/* copy / download / save */
-const flash=(b,t)=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,1400)};
-$('#copy').onclick=async e=>{if(!transcript)return;try{await navigator.clipboard.writeText(transcript);flash(e.target,'✔ Copied')}catch{flash(e.target,'Copy failed')}};
+const flash=(b,t)=>{const s=b.querySelector('span'),o=s.textContent;s.textContent=t;setTimeout(()=>s.textContent=o,1400)};
+$('#copy').onclick=async()=>{if(!transcript)return;try{await navigator.clipboard.writeText(transcript);flash($('#copy'),'Copied')}catch{flash($('#copy'),'Copy failed')}};
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name.replace(/\.[^.]+$/,'')+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 $('#dl').onclick=()=>{if(transcript)download(file?file.name:'transcript',transcript)};
 const KEY='voxscribe.history';
 const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}};
 const store=a=>{try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch{return false}};
-$('#save').onclick=e=>{
+$('#save').onclick=()=>{
   if(!transcript)return;
   const a=load();a.unshift({id:Date.now(),name:file?file.name:'transcript',dur:dur,at:new Date().toISOString(),text:transcript});
-  flash(e.target,store(a.slice(0,50))?'✔ Saved':'Save failed');render();
+  flash($('#save'),store(a.slice(0,50))?'Saved':'Save failed');render();
 };
 function render(){
   const a=load(),tb=$('#rows');tb.innerHTML='';$('#noRows').hidden=a.length>0;
@@ -245,14 +265,15 @@ function render(){
     const when=new Date(h.at).toLocaleString('en-US',{month:'short',day:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
     [i+1,h.name,fmt(h.dur),when].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
     const td=document.createElement('td');
-    [['📄','View transcript',()=>{transcript=h.text;$('#out').textContent=h.text;setStat('Loaded');$('#top').scrollIntoView({behavior:'smooth'})}],
-     ['⬇','Download',()=>download(h.name,h.text)],
-     ['🗑','Delete',()=>{store(load().filter(x=>x.id!==h.id));render()},'del']].forEach(([ic,t,fn,cl])=>{
-      const b=document.createElement('button');b.textContent=ic;b.title=t;b.setAttribute('aria-label',t);if(cl)b.className=cl;b.onclick=fn;td.appendChild(b)});
+    [['doc','View transcript',()=>{transcript=h.text;$('#out').textContent=h.text;setStat('Loaded');$('#top').scrollIntoView({behavior:'smooth'})}],
+     ['dl','Download',()=>download(h.name,h.text)],
+     ['trash','Delete',()=>{store(load().filter(x=>x.id!==h.id));render()},'del']].forEach(([n,t,fn,cl])=>{
+      const b=document.createElement('button');b.className='ib'+(cl?' '+cl:'');b.innerHTML=ic(n);b.title=t;b.setAttribute('aria-label',t);b.onclick=fn;td.appendChild(b)});
     tr.appendChild(td);tb.appendChild(tr);
   });
 }
-render();
+$('#play').innerHTML=ic('play');
+render();draw();
 </script>
 </body>
 </html>
